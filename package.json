@@ -1,0 +1,42 @@
+{
+  "name": "pg-upmig",
+  "version": "0.0.25",
+  "description": "Postgresql migration tool",
+  "keywords": [
+    "database",
+    "postgres",
+    "postgresql",
+    "migration",
+    "migrate",
+    "migrator",
+    "pg",
+    "sql"
+  ],
+  "main": "index.js",
+  "bin": "src/cli.js",
+  "homepage": "https://github.com/Come2Daddy/pg-upmig#readme",
+  "bugs": { "url" : "https://github.com/Come2Daddy/pg-upmig/issues"},
+  "repository": "git@github.com:Come2Daddy/pg-upmig.git",
+  "author": "Come2Daddy <ludovic.landier@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "commander": "^6.1.0",
+    "dotenv": "^8.2.0",
+    "pg": "^8.3.3"
+  },
+  "devDependencies": {
+    "concat-stream": "^2.0.0",
+    "coveralls": "^3.1.0",
+    "eslint": "^7.9.0",
+    "jest": "^26.4.2",
+    "knex": "^0.21.6"
+  },
+  "scripts": {
+    "lint": "eslint --ignore-path .gitignore .",
+    "jest": "jest --runInBand",
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls",
+    "test": "yarn lint && yarn jest"
+  }
+}
