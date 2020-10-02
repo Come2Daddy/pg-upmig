@@ -8,12 +8,22 @@ services:
     - postgresql
 addons:
     postgresql: "12"
+    apt:
+        packages:
+            - postgresql-12
+            - postgresql-client-12
 jobs:
     include:
         - node_js: "12.18.4"
+before_script:
+    - psql -c 'create database travis_ci_test;' -U postgres
 script:
     - yarn test
     - yarn run coveralls
-cache: yarn
+cache:
+    bundler: true
+    directories:
+        - node_modules
+    yarn: true
 after_success:
     - codecov
