@@ -15,7 +15,9 @@
   "main": "index.js",
   "bin": "src/cli.js",
   "homepage": "https://github.com/Come2Daddy/pg-upmig#readme",
-  "bugs": { "url" : "https://github.com/Come2Daddy/pg-upmig/issues"},
+  "bugs": {
+    "url": "https://github.com/Come2Daddy/pg-upmig/issues"
+  },
   "repository": "git@github.com:Come2Daddy/pg-upmig.git",
   "author": "Come2Daddy <ludovic.landier@gmail.com>",
   "license": "MIT",
@@ -36,7 +38,7 @@
   "scripts": {
     "lint": "eslint --ignore-path .gitignore .",
     "jest": "jest --runInBand",
-    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls",
+    "coveralls": "coveralls < coverage/lcov.info",
     "test": "yarn lint && yarn jest"
   }
 }
