@@ -1,4 +1,6 @@
-sudo: false
+os:
+    - linux
+    dist: xenial
 language: node_js
 node_js:
     - 12
@@ -6,12 +8,12 @@ services:
     - postgresql
 addons:
     postgresql: "12"
-matrix:
+jobs:
     include:
         - node_js: "12.18.4"
 script:
     - yarn test
     - yarn run coveralls
-env:
-    global:
-        - PGPORT=5433
+cache: yarn
+after_success:
+    - codecov
