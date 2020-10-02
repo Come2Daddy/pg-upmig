@@ -16,7 +16,7 @@ jobs:
     include:
         - node_js: "12.18.4"
 before_script:
-    - psql -c 'create database travis_ci_test;' -U postgres
+    - cp config/database.yml.travis config/database.yml
 script:
     - yarn test
     - yarn run coveralls
