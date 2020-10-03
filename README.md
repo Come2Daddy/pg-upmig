@@ -1,6 +1,6 @@
 # Postgres migration tool
 [![Build Status](https://travis-ci.com/Come2Daddy/pg-upmig.svg?branch=master)](https://travis-ci.com/Come2Daddy/pg-upmig)
-[![Coverage Status](https://coveralls.io/repos/github/Come2Daddy/pg-upmig/badge.svg)](https://coveralls.io/github/Come2Daddy/pg-upmig)
+[![Coverage Status](https://coveralls.io/repos/github/Come2Daddy/pg-upmig/badge.svg?branch=master)](https://coveralls.io/github/Come2Daddy/pg-upmig?branch=master)
 [![GitHub license](https://img.shields.io/github/license/Come2Daddy/pg-upmig.svg)](https://github.com/Come2Daddy/pg-upmig/blob/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/Come2Daddy/pg-upmig.svg)](https://GitHub.com/Come2Daddy/pg-upmig/releases/)
 [![Dependencies](https://david-dm.org/Come2Daddy/pg-upmig.svg)](https://github.com/Come2Daddy/pg-upmig/blob/master/package.json)
