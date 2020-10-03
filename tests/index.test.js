@@ -178,6 +178,14 @@ describe("Migration using environment variables", () => {
         });
         expect(up).toEqual(files.pending.slice(0, 2));
     });
+
+    test("Should create unamed migration", async () => {
+        const created = await mig.create("");
+        const re = new RegExp("")
+        expect(/^[0-9]+_unnamed/.test(created)).toBe(true);
+        expect(fs.existsSync(path.join(fixtures.migrations, fixtures.sql, created+".sql"))).toBe(true);
+        expect(fs.existsSync(path.join(fixtures.migrations, created+".js"))).toBe(true);
+    });
 });
 
 describe("Migration using custom PG database client", () => {

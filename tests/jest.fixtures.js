@@ -7,6 +7,11 @@ module.exports = {
     migrationFile: "jest-up",
     jestmigTable: "jest_mig_test",
     cli: {
+        _cmds: {
+            "perform": "up",
+            "new": "create",
+            "list": "pending"
+        },
         globalOptions: [
             "-V, --version",
             "-e, --env <path>",
@@ -15,9 +20,9 @@ module.exports = {
             "-h, --help"
         ],
         commands: [
-            "up [options]",
-            "new [options]",
-            "list [options]",
+            "%__perform__% [options]",
+            "%__new__% [options]",
+            "%__list__% [options]",
             "help [command]"
         ],
         upHelp: [

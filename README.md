@@ -1,6 +1,6 @@
 # Postgres migration tool
 [![Build Status](https://travis-ci.com/Come2Daddy/pg-upmig.svg?branch=master)](https://travis-ci.com/Come2Daddy/pg-upmig)
-[![codecov](https://codecov.io/gh/Come2Daddy/pg-upmig/branch/master/graph/badge.svg)](https://codecov.io/gh/Come2Daddy/pg-upmig)
+[![Coverage Status](https://coveralls.io/repos/github/Come2Daddy/pg-upmig/badge.svg)](https://coveralls.io/github/Come2Daddy/pg-upmig)
 [![GitHub license](https://img.shields.io/github/license/Come2Daddy/pg-upmig.svg)](https://github.com/Come2Daddy/pg-upmig/blob/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/Come2Daddy/pg-upmig.svg)](https://GitHub.com/Come2Daddy/pg-upmig/releases/)
 [![Dependencies](https://david-dm.org/Come2Daddy/pg-upmig.svg)](https://github.com/Come2Daddy/pg-upmig/blob/master/package.json)
@@ -40,7 +40,7 @@ module.exports = (client, method) => {
   });
 }
 ```
-You may want to use your specific client query builder (**API**) instead of raw SQL queries. You may also want to skip sql file creation ([CLI](#new), [API](#pg-upmig.createname-nosql))
+You may want to use your specific client query builder (**API**) instead of raw SQL queries. You may also want to skip sql file creation ([CLI](#create), [API](#pg-upmig.createname-nosql))
 
 ### SQL queries
 The SQL files in sql directory are placeholders for you to write migrations steps.
@@ -60,8 +60,8 @@ Options:
 
 Commands:
   up [options]    perform all pending migrations
-  new [options]   generate new migration file
-  list [options]  list pending migrations
+  create [options]   generate new migration file
+  pending [options]  list pending migrations
   help [command]  display help for command
 ```
 
@@ -78,10 +78,10 @@ Options:
   -h, --help               display help for command
 ```
 
-#### new
+#### create
 >Generates a new set of migration files, allowing you to skip SQL source file creation in case you plan on using a custom client with query builder.
 ```bash
-Usage: pg-upmig new <filename>
+Usage: pg-upmig create <filename>
 
 Generate new migration file
 
@@ -90,10 +90,10 @@ Options:
   -h, --help               display help for command
 ```
 
-#### list
+#### pending
 >Lists pending migrations, and shows number of done migrations.
 ```bash
-Usage: pg-upmig list [options]
+Usage: pg-upmig pending [options]
 
 List pending migrations
 

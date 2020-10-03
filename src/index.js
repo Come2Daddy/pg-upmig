@@ -185,16 +185,12 @@ class migration {
 
         await this._connect();
 
-        // No access no cookies
-        if (!fs.promises.access(process.cwd(), fs.constants.R_OK | fs.constants.W_OK)) throw new Error("Cannot access project directory...");
-
         // Creates directories if needed
         try {
-            const stat = await fs.promises.stat(path.join(this.options.migrations, "sql"));
-            if (!stat.isDirectory()) throw new Error("Catch me !");
+            await fs.promises.mkdir(this.options.migrations);
+            await fs.promises.mkdir(path.join(this.options.migrations, "sql"));
         } catch (error) {
-            this._debug(error, 1);
-            await fs.promises.mkdir(path.join(this.options.migrations, "sql"), {recursive: true});
+            this._debug(error, 2);
         }
 
         if (!fs.existsSync(path.join(this.options.migrations, "template.stub"))) {
