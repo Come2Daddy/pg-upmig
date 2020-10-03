@@ -198,9 +198,9 @@ const migration = new upmig({
 // Perform pending migrations till the first "critical" migration
 // Could be the last migration before a breaking change
 async function migrateTillCritical () {
-  const pending = await migration.pending();
+  const migrate = await migration.pending();
 
-  const critical = pending.find(item => /crititcal/i.test(item.name));
+  const critical = migrate.pending.find(item => /critical/i.test(item.name));
 
   const options = {};
 
@@ -233,7 +233,7 @@ function customFunction () {
   .catch((error) => {
     // log error
   })
-  .finaly(() => {
+  .finally(() => {
     // we are done
     migrations.release();
   });
