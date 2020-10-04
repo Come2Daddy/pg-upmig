@@ -1,7 +1,6 @@
 const fs = require("fs");
 const fixtures = require("./jest.fixtures.js");
 const { Client } = require("pg");
-require("dotenv").config({path: "../src/.env"});
 
 module.exports = async () => {
     try {

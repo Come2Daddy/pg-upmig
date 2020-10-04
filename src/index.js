@@ -1,7 +1,6 @@
 /** @module pg-upmig */
 
 const { Client, types } = require("pg");
-const dotenv = require("dotenv");
 const path = require("path");
 const fs = require("fs");
 
@@ -12,7 +11,6 @@ const fs = require("fs");
  * @param {Object} params Constructor arguments
  * @param {Object} params.client Custom database client
  * @param {Object} params.connection PG connection params
- * @param {String} params.envFile Environment file path
  * @param {Object} params.options Global options
  * @param {String} params.options.table Migrations table
  * @param {String} params.options.migrations Migrations path
@@ -44,8 +42,8 @@ class migration {
         this.isConnected = false;
 
         this.options = {
-            table: "pg_upmig",
-            migrations: "./migrations",
+            table: process.env.UPMIG_TABLE||"pg_upmig",
+            migrations: process.env.UPMIG_PATH||"./migrations",
             transactionnal: true,
             queryMethod: "query",
             connectMethod: "connect",
@@ -56,29 +54,24 @@ class migration {
             debug: false
         };
 
-        if (params.options) {
+        try {
+            const dotConfig = require(path.join(process.cwd(),".upmigrc.js"));
+            this.options.migrations = dotConfig.migrations?dotConfig.migrations:this.options.migrations;
+            this.options.table = dotConfig.table?dotConfig.table:this.options.table;
+        } catch (error) { }
+
+        if ((params||{}).options) {
             Object.assign(this.options, params.options);
         }
 
-        // finds environment file path first if defined
-        try {
-            const cfg = dotenv.config({path: params.envFile});
-            if (cfg.error) {
-                throw new Error("Check for standard environment file (.env)");
-            }
-        } catch (error) {
-            this._debug(error, 1);
-            dotenv.config();
-        }
-
         // Sets custom database client
-        if (params.client) {
+        if ((params||{}).client) {
             this.client = params.client;
         }
 
         // Sets default database client
         if (!this.client) {
-            if (params.connection) {
+            if ((params||{}).connection) {
                 // Uses connection params
                 this.client = new Client(params.connection);
             } else {

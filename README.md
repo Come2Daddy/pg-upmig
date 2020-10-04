@@ -19,6 +19,20 @@ or
 ```bash
 yarn add pg-upmig
 ```
+
+## Configuration
+Either use environment variables
+```bash
+UPMIG_PATH=./migrations
+UPMIG_TABLE=pg_upmig
+```
+or use `.upmigrc.js` to set global options:
+```javascript
+module.exports = {
+  migrations: "./migrations", // Where to store migrations files
+  table: "pg_upmig", // Table name where migrations history is stored
+};
+```
 ## Migrations folder tree view
 ```
 .
@@ -54,7 +68,6 @@ Usage: pg-upmig [options] [command]
 Options:
   -V, --version   output the version number
   -h, --help      display help for command
-  -e, --env <path>         specify environment file path
   -m, --migrations <path>  specify migrations path (default: "./migrations")
   -p, --pgtable <table>    specify migration table name (default: "pg_upmig")
 
@@ -141,7 +154,6 @@ migration.up({
 |options|[Global options](#global-options)|
 |connection|[Connection parameters](#connection-parameters) for default `node-postgres` client|
 |client|[Custom postgres client](#custom-postgres-client) instance|
-|enfFile|Environment file path (.env)|
 
 ##### Global options
 |Key|Type|Description|Default|
@@ -244,7 +256,6 @@ function customFunction () {
 *Promise*
 
 Creates timestamped migration files (sql file creation is avoided when `nosql` is `true`) using `template.stub` as a template. Filename collision is handled even if this case should not happen.
-`name` is 
 
 Returns the full name of created file :
 `1600775947530_create-table`
@@ -282,3 +293,4 @@ Returns an array of objects representing migration file:
 |name|string|Migration name excluding timestamp.|
 ## Todo
 - [ ] Custom logger implementation
+- [ ] Remove dispensable dependencies

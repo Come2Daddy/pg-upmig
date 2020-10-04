@@ -4,7 +4,16 @@ const migration = require("./index.js");
 const pkg = require("../package.json");
 const chalk = require("chalk");
 const { program } = require("commander");
+const path = require("path");
 
+let migrationsPath = process.env.UPMIG_PATH||"./migrations";
+let pgTable = process.env.UPMIG_TABLE||"pg_upmig";
+
+try {
+    const dotConfig = require(path.join(process.cwd(), ".upmigrc.js"));
+    migrationsPath = dotConfig.migrations?dotConfig.migrations:migrationsPath;
+    pgTable = dotConfig.table?dotConfig.table:pgTable;
+} catch (error) {}
 
 function steps (s) {
     const parsed = parseInt(s.replace(/[^0-9]+/g, ""));
@@ -26,16 +35,9 @@ function migTable (name) {
 
 exports.migTable = migTable;
 
-let envFile = ".env";
-let migrationsPath = "./migrations";
-let pgTable = "pg_upmig";
-
 function setOpt (namespace) {
     return (option) => {
         switch (namespace) {
-            case "env":
-                envFile = option ? option:envFile;
-                break;
             case "migrations":
                 migrationsPath = option ? option:migrationsPath;
                 break;
@@ -49,25 +51,22 @@ exports.setOpt = setOpt;
 
 exports._env = () => {
     return {
-        envFile,
         migrationsPath,
         pgTable
     };
 }
 
-program.on("option:env", setOpt("env"));
 program.on("option:migrations", setOpt("migrations"));
 program.on("option:pgtable", setOpt("pgtable"));
 
 program.version(pkg.version)
 .arguments("<cmd> [opt]")
 .usage("<command> [options]")
-.option("-e, --env <path>", "specify environment file path")
 .option("-m, --migrations <path>", "specify migrations path", "./migrations")
 .option("-p, --pgtable <table>", "specify migration table name", "pg-upmig", migTable);
 
 async function up (cmd) {
-    const mig = new migration({envFile});
+    const mig = new migration();
     await mig.init({
         table: pgTable,
         migrations: migrationsPath,
@@ -98,9 +97,9 @@ program
 });
 
 async function create (cmd, name){
-    const mig = new migration({envFile});
+    const mig = new migration();
     await mig.init({migrations: migrationsPath, table: pgTable});
-    const file = await mig.create(name.join("-"), cmd.nosql);
+    const file = await mig.create(name?name.join("-"):"", cmd.nosql);
     mig.release();
     return file;
 }
@@ -119,7 +118,7 @@ program
 });
 
 async function pending (cmd) {
-    const mig = new migration({envFile});
+    const mig = new migration();
     await mig.init({migrations: migrationsPath, table: pgTable, history: cmd.history});
     const list = await mig.pending();
     mig.release();
