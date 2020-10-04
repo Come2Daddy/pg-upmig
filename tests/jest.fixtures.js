@@ -1,11 +1,10 @@
 module.exports = {
-    envFile: "src/.env",
     migrations: "./jest-migrations",
     sql: "sql",
     templateStub: "template.stub",
     pgTable: "jest_pg_upmig",
     migrationFile: "jest-up",
-    jestmigTable: "jest_mig_test",
+    jestmigTable: "jest_upmig_test",
     cli: {
         _cmds: {
             "perform": "up",
@@ -14,7 +13,6 @@ module.exports = {
         },
         globalOptions: [
             "-V, --version",
-            "-e, --env <path>",
             "-m, --migrations <path>",
             "-p, --pgtable <table>",
             "-h, --help"
