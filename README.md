@@ -28,6 +28,22 @@ UPMIG_TABLE=pg_upmig
 ```
 or use `.upmigrc.js` to set global options:
 ```javascript
+
+/** Quick tip to load .env file in local environment for example **/
+const fs = require("fs");
+
+try {
+    fs.readFileSync(".env") // read config file
+    .toString("utf8") // buffer to string
+    .split(/\n|\r|\r/) // break by new line
+    .filter(item => /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/.test(item)) // keep key / val
+    .map(item => {
+        const match = item.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+        if (!Object.prototype.hasOwnProperty.call(process.env, match[1])) process.env[match[1]] = match[2].replace(/^("|')(.*)\1$/, "$2"); // set env without overwritting
+    });
+} catch (error) {}
+/** End of tip **/
+
 module.exports = {
   migrations: "./migrations", // Where to store migrations files
   table: "pg_upmig", // Table name where migrations history is stored
