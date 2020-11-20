@@ -25,6 +25,7 @@ Either use environment variables
 ```bash
 UPMIG_PATH=./migrations
 UPMIG_TABLE=pg_upmig
+UPMIG_REJECT=false
 ```
 or use `.upmigrc.js` to set global options:
 ```javascript
@@ -47,6 +48,7 @@ try {
 module.exports = {
   migrations: "./migrations", // Where to store migrations files
   table: "pg_upmig", // Table name where migrations history is stored
+  reject: false
 };
 ```
 ## Migrations folder tree view
@@ -86,6 +88,7 @@ Options:
   -h, --help      display help for command
   -m, --migrations <path>  specify migrations path (default: "./migrations")
   -p, --pgtable <table>    specify migration table name (default: "pg_upmig")
+  -r, --reject             dont ignore unauthorized ssl rejection
 
 Commands:
   up [options]    perform all pending migrations
