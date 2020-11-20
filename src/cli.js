@@ -8,11 +8,13 @@ const path = require("path");
 
 let migrationsPath = process.env.UPMIG_PATH||"./migrations";
 let pgTable = process.env.UPMIG_TABLE||"pg_upmig";
+let reject = Boolean(process.env.UPMIG_REJECT)||false;
 
 try {
     const dotConfig = require(path.join(process.cwd(), ".upmigrc.js"));
     migrationsPath = dotConfig.migrations?dotConfig.migrations:migrationsPath;
     pgTable = dotConfig.table?dotConfig.table:pgTable;
+    reject = dotConfig.reject?dotConfig.reject:reject;
 } catch (error) {}
 
 function steps (s) {
@@ -43,6 +45,9 @@ function setOpt (namespace) {
                 break;
             case "pgtable":
                 pgTable = option ? migTable(option):pgTable;
+                break;
+            case "reject":
+                reject = option;
         }
     }
 }
@@ -58,15 +63,23 @@ exports._env = () => {
 
 program.on("option:migrations", setOpt("migrations"));
 program.on("option:pgtable", setOpt("pgtable"));
+program.on("option:reject", setOpt("reject"));
 
 program.version(pkg.version)
 .arguments("<cmd> [opt]")
 .usage("<command> [options]")
 .option("-m, --migrations <path>", "specify migrations path", "./migrations")
-.option("-p, --pgtable <table>", "specify migration table name", "pg-upmig", migTable);
+.option("-p, --pgtable <table>", "specify migration table name", "pg-upmig", migTable)
+.option("-r, --reject", "dont ignore unauthorized ssl rejection");
 
 async function up (cmd) {
-    const mig = new migration();
+    const mig = new migration({
+        connection: {
+            ssl: {
+                rejectUnauthorized: reject
+            }
+        }
+    });
     await mig.init({
         table: pgTable,
         migrations: migrationsPath,
@@ -97,7 +110,13 @@ program
 });
 
 async function create (cmd, name){
-    const mig = new migration();
+    const mig = new migration({
+        connection: {
+            ssl: {
+                rejectUnauthorized: reject
+            }
+        }
+    });
     await mig.init({migrations: migrationsPath, table: pgTable});
     const file = await mig.create(name?name.join("-"):"", cmd.nosql);
     mig.release();
@@ -118,7 +137,13 @@ program
 });
 
 async function pending (cmd) {
-    const mig = new migration();
+    const mig = new migration({
+        connection: {
+            ssl: {
+                rejectUnauthorized: reject
+            }
+        }
+    });
     await mig.init({migrations: migrationsPath, table: pgTable, history: cmd.history});
     const list = await mig.pending();
     mig.release();

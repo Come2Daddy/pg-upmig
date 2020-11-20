@@ -21,15 +21,9 @@ afterAll(async () => {
     await teardown();
 });
 
-describe("Covering privates and specific code - fallback to default .env file", () => {
+describe("Covering privates and specific code with default env vars", () => {
     beforeAll(async () => {
-        mig = new lib({
-            options: {
-                migrations: fixtures.migrations,
-                table: fixtures.pgTable
-            },
-            envFile: "x/.env"
-        });
+        mig = new lib();
         await mig.init();
     });
 
@@ -72,12 +66,7 @@ describe("Covering privates and specific code - fallback to default .env file", 
 
 describe("Migration using environment variables", () => {
     beforeAll(async () => {
-        mig = new lib({
-            options: {
-                migrations: fixtures.migrations,
-                table: fixtures.pgTable,
-            }
-        });
+        mig = new lib();
         await mig.init();
     });
 

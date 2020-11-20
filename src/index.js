@@ -72,12 +72,21 @@ class migration {
         // Sets default database client
         if (!this.client) {
             if ((params||{}).connection) {
+                if (!params.connection.hasOwnProperty("ssl")) {
+                    params.connection.ssl= { rejectUnauthorized:  process.env.UPMIG_REJECT||false };
+                } else if (!params.connection.ssl.hasOwnProperty("rejectUnauthorized")) {
+                    params.connection.ssl["rejectUnauthorized"] = process.env.UPMIG_REJECT||false;
+                }
                 // Uses connection params
                 this.client = new Client(params.connection);
             } else {
                 // Try to connect with environment variables
                 // At this point, if nothing is provided we let PG client rise errors
-                this.client = new Client();
+                this.client = new Client({
+                    ssl: {
+                        rejectUnauthorized: process.env.UPMIG_REJECT||false
+                    }
+                });
             }
         }
     }
