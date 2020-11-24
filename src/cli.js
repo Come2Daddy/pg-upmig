@@ -2,7 +2,6 @@
 
 const migration = require("./index.js");
 const pkg = require("../package.json");
-const chalk = require("chalk");
 const { program } = require("commander");
 const path = require("path");
 
@@ -103,9 +102,9 @@ program
 
     const len = done.reduce((accu, file) => Math.max(accu, file.name.length), 21);
     for (let file of done) {
-        process.stdout.write(`\n${chalk.blue("⇈")}\t${chalk.yellow(file.name)}${" ".repeat(Math.ceil(len-file.name.length))}\t${chalk.magenta.bold(file.ts)}`);
+        process.stdout.write(`\n\x1b[32m⇈")}\t\x1b[33m${file.name}\x1b[0m${" ".repeat(Math.ceil(len-file.name.length))}\t\x1b[35;1m${file.ts}\x1b[0m`);
     }
-    process.stdout.write(`\n${chalk.green("✓")}\tMigrations completed:${" ".repeat(Math.ceil(len-21))}\t${chalk.magenta.bold(done.length)}`);
+    process.stdout.write(`\n\x1b[32m✓\x1b[0m\tMigrations completed:${" ".repeat(Math.ceil(len-21))}\t\x1b[35;1m${done.length}\x1b[0m`);
     process.stdout.write("\n\n");
 });
 
@@ -132,7 +131,7 @@ program
 .option("-n, --nosql", "prevent creation of sql file")
 .action(async (cmd, name) => {
     const file = await create(cmd, name);
-    process.stdout.write(`\n${chalk.green("✓")}\tMigration file created:\t\t${chalk.magenta.bold(file)}`);
+    process.stdout.write(`\n\x1b[32m✓\x1b[0m\tMigration file created:\t\t\x1b[35;1m${file}\x1b[0m`);
     process.stdout.write("\n\n");
 });
 
@@ -160,9 +159,9 @@ program
     const list = await pending(cmd);
     const len = list.pending.reduce((accu, file) => Math.max(accu, file.name.length), 19);
     for (let file of list.pending) {
-        process.stdout.write(`\n${chalk.blue("⇉")}\t${chalk.yellow.bold(file.name)}${" ".repeat(Math.ceil(len-file.name.length))}\t${chalk.magenta.bold(file.ts)}`);
+        process.stdout.write(`\n\x1b[34m⇉\t\x1b[33;1m${file.name}\x1b[0m${" ".repeat(Math.ceil(len-file.name.length))}\t\x1b[35;1m${file.ts}\x1b[0m`);
     }
-    process.stdout.write(`\n${chalk.cyan("ⓘ")}\tPending migrations:${" ".repeat(Math.ceil(len-19))}\t${chalk.magenta.bold(list.pending.length)}${cmd.history?`/${chalk.magenta.bold(list.history+list.pending.length)} (${chalk.green.bold(list.history)} done)`:""}`);
+    process.stdout.write(`\n\x1b[36mⓘ\x1b[0m\tPending migrations:${" ".repeat(Math.ceil(len-19))}\t\x1b[35;1m${list.pending.length}\x1b[0m${cmd.history?`/\x1b[35;1m${list.history+list.pending.length}\x1b[0m \x1b[32;1m(${list.history}\x1b[0m done)`:""}`);
     process.stdout.write("\n\n");
 });
 
