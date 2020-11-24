@@ -248,7 +248,7 @@ describe("Create migration file", () => {
 
     test("Init and create new migration file", async () => {
         const response = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.new, fixtures.migrationFile], [], {env});
-        const line = response.trim();
+        const line = response.trim().replace(/\x1b[[0-9;]+m/g, "");
         expect(line).toEqual(expect.stringMatching(/Migration file created:\s+[0-9]+_.+$/i));
         const filename = line.replace(/^.+\s([0-9]+_[0-9a-z_\-]+)$/i, "$1");
         expect(fs.existsSync(path.join(fixtures.migrations, fixtures.sql, filename+".sql"))).toBe(true);
@@ -257,7 +257,7 @@ describe("Create migration file", () => {
 
     test("Create new migration file without sql placeholder file", async () => {
         const response = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.new, fixtures.migrationFile, "-n"], [], {env});
-        const line = response.trim();
+        const line = response.trim().replace(/\x1b[[0-9;]+m/g, "");
         expect(line).toEqual(expect.stringMatching(/Migration file created:\s+[0-9]+_.+$/i));
         const filename = line.replace(/^.+\s([0-9]+_[0-9a-z_\-]+)$/i, "$1");
         expect(fs.existsSync(path.join(fixtures.migrations, fixtures.sql, filename+".sql"))).toBe(false);
@@ -280,7 +280,7 @@ describe("List pending migrations", () => {
         const details = [];
         for (let i = 0; i <= Math.round(Math.random() * 5); i++) {
             const created = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.new, fixtures.migrationFile], [], {env});
-            details.push(created.trim().match(/\s([0-9]+)_([0-9a-z_\-]+)$/i));
+            details.push(created.trim().replace(/\x1b[[0-9;]+m/g, "").match(/\s([0-9]+)_([0-9a-z_\-]+)$/i));
         }
         const containing = [];
 
@@ -290,7 +290,7 @@ describe("List pending migrations", () => {
         containing.push(expect.stringMatching(new RegExp(`Pending migrations:\\s+${details.length}$`, "i")));
 
         const response = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.list], [], {env});
-        expect(response.trim().split(EOL)).toEqual(containing);
+        expect(response.trim().replace(/\x1b[[0-9;]+m/g, "").split(EOL)).toEqual(containing);
 
         // Perform left pending migrations
         await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.perform], [], {env});
@@ -300,7 +300,7 @@ describe("List pending migrations", () => {
         const details = [];
         for (let i = 0; i <= Math.round(Math.random() * 5); i++) {
             const created = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.new, fixtures.migrationFile], [], {env});
-            details.push(created.trim().match(/\s([0-9]+)_([0-9a-z_\-]+)$/i));
+            details.push(created.trim().replace(/\x1b[[0-9;]+m/g, "").match(/\s([0-9]+)_([0-9a-z_\-]+)$/i));
         }
         const containing = [];
 
@@ -310,7 +310,7 @@ describe("List pending migrations", () => {
         containing.push(expect.stringMatching(new RegExp(`Pending migrations:\\s+${details.length}/\[0\-9\]\+\\s\\(\[0\-9\]\+\\sdone\\)$`, "i")));
 
         const response = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.list, "-H"], [], {env});
-        expect(response.trim().split(EOL)).toEqual(containing);
+        expect(response.trim().replace(/\x1b[[0-9;]+m/g, "").split(EOL)).toEqual(containing);
     });
 });
 
@@ -327,9 +327,9 @@ describe("Perform pending migrations", () => {
 
     test("Perform all pending migrations", async () => {
         const created = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.new, fixtures.migrationFile], [], {env});
-        const details = created.trim().match(/\s([0-9]+)_([0-9a-z_\-]+)$/i);
+        const details = created.trim().replace(/\x1b[[0-9;]+m/g, "").match(/\s([0-9]+)_([0-9a-z_\-]+)$/i);
         const response = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.perform], [], {env});
-        expect(response.trim().split(EOL)).toEqual(expect.arrayContaining([
+        expect(response.trim().replace(/\x1b[[0-9;]+m/g, "").split(EOL)).toEqual(expect.arrayContaining([
             expect.stringMatching(new RegExp(`${details[2]}\\s+${details[1]}$`, "i")),
             expect.stringMatching(/Migrations completed:\s+1$/i)
         ]));
@@ -339,10 +339,10 @@ describe("Perform pending migrations", () => {
         const details = [];
         for (let i = 0; i < 3; i++) {
             const created = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.new, fixtures.migrationFile], [], {env});
-            details.push(created.trim().match(/\s([0-9]+)_([0-9a-z_\-]+)$/i));
+            details.push(created.trim().replace(/\x1b[[0-9;]+m/g, "").match(/\s([0-9]+)_([0-9a-z_\-]+)$/i));
         }
         const response = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.perform, "-s", "2"], [], {env});
-        expect(response.trim().split(EOL)).toEqual(expect.arrayContaining([
+        expect(response.trim().replace(/\x1b[[0-9;]+m/g, "").split(EOL)).toEqual(expect.arrayContaining([
             expect.stringMatching(new RegExp(`${details[0][2]}\\s+${details[0][1]}$`, "i")),
             expect.stringMatching(new RegExp(`${details[1][2]}\\s+${details[1][1]}$`, "i")),
             expect.stringMatching(/Migrations completed:\s+2$/i)
@@ -356,11 +356,11 @@ describe("Perform pending migrations", () => {
         const details = [];
         for (let i = 0; i < 3; i++) {
             const created = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.new, fixtures.migrationFile], [], {env});
-            details.push(created.trim().match(/\s([0-9]+)_([0-9a-z_\-]+)$/i));
+            details.push(created.trim().replace(/\x1b[[0-9;]+m/g, "").match(/\s([0-9]+)_([0-9a-z_\-]+)$/i));
         }
         const ts = parseInt(details[1][1], 10) + 1;
         const response = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.perform, "-t", ts], [], {env});
-        expect(response.trim().split(EOL)).toEqual(expect.arrayContaining([
+        expect(response.trim().replace(/\x1b[[0-9;]+m/g, "").split(EOL)).toEqual(expect.arrayContaining([
             expect.stringMatching(new RegExp(`${details[0][2]}\\s+${details[0][1]}$`, "i")),
             expect.stringMatching(new RegExp(`${details[1][2]}\\s+${details[1][1]}$`, "i")),
             expect.stringMatching(/Migrations completed:\s+2$/i)
@@ -374,7 +374,7 @@ describe("Perform pending migrations", () => {
         const details = [];
         for (let i = 0; i <= 4; i++) {
             const created = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.new, fixtures.migrationFile], [], {env});
-            details.push(created.trim().match(/\s([0-9]+)_([0-9a-z_\-]+)$/i));
+            details.push(created.trim().replace(/\x1b[[0-9;]+m/g, "").match(/\s([0-9]+)_([0-9a-z_\-]+)$/i));
         }
         const byTs = Math.round(Math.random() * 3);
         const bySt = Math.round(Math.random() * 3);
@@ -388,6 +388,6 @@ describe("Perform pending migrations", () => {
         containing.push(expect.stringMatching(new RegExp(`Migrations completed:\\s+${min+1}$`, "i")));
 
         const response = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.perform, "-t", ts, "-s", bySt+1], [], {env});
-        expect(response.trim().split(EOL)).toEqual(expect.arrayContaining(containing));
+        expect(response.trim().replace(/\x1b[[0-9;]+m/g, "").split(EOL)).toEqual(expect.arrayContaining(containing));
     });
 });
