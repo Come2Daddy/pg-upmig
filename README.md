@@ -292,8 +292,11 @@ Returns an object:
 |-|-|-|
 |pending|array|Array of objects representing pending migrations files.
 |pending[].filename|string|Pending migration filename without extension.|
-|pending[].ts|number|Pending migraiton timestamp.|
+|pending[].ts|number|Pending migration timestamp.|
 |pending[].name|string|Pending migration name excluding timestamp.|
+|last|object|Latest migration performed|
+|last.ts|number|Latest migration timestamp.|
+|last.name|string|Latest migration name excluding timestamp.|
 |history|number|Number of performed migrations.|
 
 #### pg-upmig.up([options])
@@ -311,7 +314,7 @@ Returns an array of objects representing migration file:
 |Key|Type|Description|
 |-|-|-|
 |filename|string|Migration filename without extension.|
-|ts|number|Migraiton timestamp.|
+|ts|number|Migration timestamp.|
 |name|string|Migration name excluding timestamp.|
 ## Todo
 - [ ] Custom logger implementation
