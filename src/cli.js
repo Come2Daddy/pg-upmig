@@ -8,12 +8,14 @@ const path = require("path");
 let migrationsPath = process.env.UPMIG_PATH||"./migrations";
 let pgTable = process.env.UPMIG_TABLE||"pg_upmig";
 let reject = Boolean(process.env.UPMIG_REJECT)||false;
+let debug = Boolean(process.env.UPMIG_DEBUG)||false;
 
 try {
     const dotConfig = require(path.join(process.cwd(), ".upmigrc.js"));
     migrationsPath = dotConfig.migrations?dotConfig.migrations:migrationsPath;
     pgTable = dotConfig.table?dotConfig.table:pgTable;
     reject = dotConfig.reject?dotConfig.reject:reject;
+    debug = dotConfig.debug?dotConfig.debug:debug;
 } catch (error) {}
 
 function steps (s) {
@@ -47,6 +49,9 @@ function setOpt (namespace) {
                 break;
             case "reject":
                 reject = option;
+                break;
+            case "debug":
+                debug = option;
         }
     }
 }
@@ -56,20 +61,24 @@ exports.setOpt = setOpt;
 exports._env = () => {
     return {
         migrationsPath,
-        pgTable
+        pgTable,
+        reject,
+        debug
     };
 }
 
 program.on("option:migrations", setOpt("migrations"));
 program.on("option:pgtable", setOpt("pgtable"));
 program.on("option:reject", setOpt("reject"));
+program.on("option:debug", setOpt("debug"));
 
 program.version(pkg.version)
 .arguments("<cmd> [opt]")
 .usage("<command> [options]")
 .option("-m, --migrations <path>", "specify migrations path", "./migrations")
 .option("-p, --pgtable <table>", "specify migration table name", "pg-upmig", migTable)
-.option("-r, --reject", "dont ignore unauthorized ssl rejection");
+.option("-r, --reject", "dont ignore unauthorized ssl rejection")
+.option("-d, --debug", "print debug informations");
 
 async function up (cmd) {
     const mig = new migration({
@@ -83,7 +92,8 @@ async function up (cmd) {
         table: pgTable,
         migrations: migrationsPath,
         to: cmd.to,
-        steps: cmd.steps
+        steps: cmd.steps,
+        debug
     });
     const done = await mig.up();
     mig.release();
@@ -102,7 +112,7 @@ program
 
     const len = done.reduce((accu, file) => Math.max(accu, file.name.length), 21);
     for (let file of done) {
-        process.stdout.write(`\n\x1b[32m⇈")}\t\x1b[33m${file.name}\x1b[0m${" ".repeat(Math.ceil(len-file.name.length))}\t\x1b[35;1m${file.ts}\x1b[0m`);
+        process.stdout.write(`\n\x1b[32m⇈\t\x1b[33m${file.name}\x1b[0m${" ".repeat(Math.ceil(len-file.name.length))}\t\x1b[35;1m${file.ts}\x1b[0m`);
     }
     process.stdout.write(`\n\x1b[32m✓\x1b[0m\tMigrations completed:${" ".repeat(Math.ceil(len-21))}\t\x1b[35;1m${done.length}\x1b[0m`);
     process.stdout.write("\n\n");
@@ -116,7 +126,7 @@ async function create (cmd, name){
             }
         }
     });
-    await mig.init({migrations: migrationsPath, table: pgTable});
+    await mig.init({migrations: migrationsPath, table: pgTable, debug});
     const file = await mig.create(name?name.join("-"):"", cmd.nosql);
     mig.release();
     return file;
@@ -143,7 +153,7 @@ async function pending (cmd) {
             }
         }
     });
-    await mig.init({migrations: migrationsPath, table: pgTable, history: cmd.history});
+    await mig.init({migrations: migrationsPath, table: pgTable, history: cmd.history, debug});
     const list = await mig.pending();
     mig.release();
     return list;
@@ -157,9 +167,12 @@ program
 .option("-H, --history", "show history about migrations")
 .action(async (cmd) => {
     const list = await pending(cmd);
-    const len = list.pending.reduce((accu, file) => Math.max(accu, file.name.length), 19);
+    const len = list.pending.reduce((accu, file) => Math.max(accu, file.name.length, (list.last||{}).name||0), 19);
+    if (list.last && cmd.history) {
+        process.stdout.write(`\n\x1b[32m✓ Last\t\t\x1b[32m${list.last.name}\x1b[0m${" ".repeat(Math.ceil(len-list.last.name.length))}\t\x1b[35m${list.last.ts}\x1b[0m\n`);
+    }
     for (let file of list.pending) {
-        process.stdout.write(`\n\x1b[34m⇉\t\x1b[33;1m${file.name}\x1b[0m${" ".repeat(Math.ceil(len-file.name.length))}\t\x1b[35;1m${file.ts}\x1b[0m`);
+        process.stdout.write(`\n\x1b[34m⇉ Pending\t\x1b[33;1m${file.name}\x1b[0m${" ".repeat(Math.ceil(len-file.name.length))}\t\x1b[35;1m${file.ts}\x1b[0m`);
     }
     process.stdout.write(`\n\x1b[36mⓘ\x1b[0m\tPending migrations:${" ".repeat(Math.ceil(len-19))}\t\x1b[35;1m${list.pending.length}\x1b[0m${cmd.history?`/\x1b[35;1m${list.history+list.pending.length}\x1b[0m \x1b[32;1m(${list.history}\x1b[0m done)`:""}`);
     process.stdout.write("\n\n");

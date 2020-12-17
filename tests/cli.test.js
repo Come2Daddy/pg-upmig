@@ -89,6 +89,7 @@ describe("Core logic", () => {
         };
         expect(pending).toEqual({
             history: 0,
+            last: null,
             pending: [file]
         });
     });
@@ -304,13 +305,15 @@ describe("List pending migrations", () => {
         }
         const containing = [];
 
+        containing.push(expect.stringMatching(new RegExp(`Last\\s+${fixtures.migrationFile}\\s+\[0\-9\]+`)))
+
         for (let i = 0; i < details.length; i++) {
-            containing.push(expect.stringMatching(new RegExp(`${details[i][2]}\\s+${details[i][1]}$`, "i")));
+            containing.push(expect.stringMatching(new RegExp(`Pending\\s+${details[i][2]}\\s+${details[i][1]}$`, "i")));
         }
         containing.push(expect.stringMatching(new RegExp(`Pending migrations:\\s+${details.length}/\[0\-9\]\+\\s\\(\[0\-9\]\+\\sdone\\)$`, "i")));
 
         const response = await proc.execute(["-m", fixtures.migrations, "-p", fixtures.pgTable, fixtures.cli._cmds.list, "-H"], [], {env});
-        expect(response.trim().replace(/\x1b[[0-9;]+m/g, "").split(EOL)).toEqual(containing);
+        expect(response.trim().replace(/\x1b[[0-9;]+m/g, "").split(EOL).filter(item => item)).toEqual(containing);
     });
 });
 
