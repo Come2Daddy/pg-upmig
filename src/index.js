@@ -58,7 +58,9 @@ class migration {
             const dotConfig = require(path.join(process.cwd(),".upmigrc.js"));
             this.options.migrations = dotConfig.migrations?dotConfig.migrations:this.options.migrations;
             this.options.table = dotConfig.table?dotConfig.table:this.options.table;
-        } catch (error) { }
+        } catch (error) {
+            this._debug(error, 3);
+        }
 
         if ((params||{}).options) {
             Object.assign(this.options, params.options);
@@ -73,9 +75,9 @@ class migration {
         if (!this.client) {
             if ((params||{}).connection) {
                 if (!params.connection.hasOwnProperty("ssl")) {
-                    params.connection.ssl= { rejectUnauthorized:  process.env.UPMIG_REJECT||false };
+                    params.connection.ssl= { rejectUnauthorized:  Boolean(process.env.UPMIG_REJECT||0) };
                 } else if (!params.connection.ssl.hasOwnProperty("rejectUnauthorized")) {
-                    params.connection.ssl["rejectUnauthorized"] = process.env.UPMIG_REJECT||false;
+                    params.connection.ssl["rejectUnauthorized"] = Boolean(process.env.UPMIG_REJECT||0);
                 }
                 // Uses connection params
                 this.client = new Client(params.connection);
@@ -84,7 +86,7 @@ class migration {
                 // At this point, if nothing is provided we let PG client rise errors
                 this.client = new Client({
                     ssl: {
-                        rejectUnauthorized: process.env.UPMIG_REJECT||false
+                        rejectUnauthorized: Boolean(process.env.UPMIG_REJECT||0)
                     }
                 });
             }
@@ -276,7 +278,7 @@ module.exports = async (client, method) => {
         await this.init();
 
         const files = await this._files();
-        const latest = this._pluck(await this._query(`SELECT ts FROM ${this.options.table} ORDER BY ts DESC;`));
+        const latest = this._pluck(await this._query(`SELECT ts, name FROM ${this.options.table} ORDER BY ts DESC;`));
         let idx = 0;
 
         // Find the first file with a timestamp greater than the last successful migration
@@ -286,7 +288,13 @@ module.exports = async (client, method) => {
 
         const pending = idx >= 0 ? files.slice(idx, files.length) : [];
 
-        return {pending, history: latest.length};
+        let last = null;
+        // Find the last migration
+        if (latest.length) {
+            last = latest[0];
+        }
+
+        return {pending, history: latest.length, last};
     }
 
     /**

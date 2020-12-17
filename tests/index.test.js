@@ -94,7 +94,7 @@ describe("Migration using environment variables", () => {
 
     test("Should list empty pending migrations", async () => {
         const files = await mig.pending();
-        expect(files).toEqual({pending: [], history: 0});
+        expect(files).toEqual({pending: [], last: null, history: 0});
     });
 
     test("Should create migration files", async () => {
@@ -105,7 +105,7 @@ describe("Migration using environment variables", () => {
 
     test("Should list pending migrations", async () => {
         const files = await mig.pending();
-        expect(files).toEqual({pending: [{filename: jestmig, name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}], history: 0});
+        expect(files).toEqual({last: null, pending: [{filename: jestmig, name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}], history: 0});
     });
 
     test("Should perform pending migrations", async () => {
@@ -117,7 +117,7 @@ describe("Migration using environment variables", () => {
 
     test("Should list empty pending migrations with history", async () => {
         const files = await mig.pending();
-        expect(files).toEqual({pending: [], history: 1});
+        expect(files).toEqual({pending: [], history: 1, last: {name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}});
     });
 
     test("Should create 4 migration files with SQL", async () => {
@@ -147,7 +147,7 @@ describe("Migration using environment variables", () => {
                 ts: parseInt(item.match(/^([0-9]+)_/)[1], 10)
             };
         });
-        expect(files).toEqual({pending, history: 1});
+        expect(files).toEqual({pending, history: 1, last: {name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}});
     });
 
     test("Should perform 2 pending migrations over 3 steps", async () => {
@@ -213,7 +213,7 @@ describe("Migration using custom PG database client", () => {
 
     test("Should list empty pending migrations", async () => {
         const files = await mig.pending();
-        expect(files).toEqual({pending: [], history: 0});
+        expect(files).toEqual({pending: [], history: 0, last: null});
     });
 
     test("Should create migration files", async () => {
@@ -224,7 +224,7 @@ describe("Migration using custom PG database client", () => {
 
     test("Should list pending migrations", async () => {
         const files = await mig.pending();
-        expect(files).toEqual({pending: [{filename: jestmig, name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}], history: 0});
+        expect(files).toEqual({last: null, pending: [{filename: jestmig, name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}], history: 0});
     });
 
     test("Should perform pending migrations", async () => {
@@ -236,7 +236,7 @@ describe("Migration using custom PG database client", () => {
 
     test("Should list empty pending migrations with history", async () => {
         const files = await mig.pending();
-        expect(files).toEqual({pending: [], history: 1});
+        expect(files).toEqual({pending: [], history: 1, last: {name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}});
     });
 
     test("Should create 4 migration files with SQL", async () => {
@@ -266,7 +266,7 @@ describe("Migration using custom PG database client", () => {
                 ts: parseInt(item.match(/^([0-9]+)_/)[1], 10)
             };
         });
-        expect(files).toEqual({pending, history: 1});
+        expect(files).toEqual({pending, history: 1, last: {name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}});
     });
 
     test("Should perform 2 pending migrations over 3 steps", async () => {
@@ -334,7 +334,7 @@ describe("Migration using custom Knex database client", () => {
 
     test("Should list empty pending migrations", async () => {
         const files = await mig.pending();
-        expect(files).toEqual({pending: [], history: 0});
+        expect(files).toEqual({pending: [], history: 0, last: null});
     });
 
     test("Should create migration files", async () => {
@@ -345,7 +345,7 @@ describe("Migration using custom Knex database client", () => {
 
     test("Should list pending migrations", async () => {
         const files = await mig.pending();
-        expect(files).toEqual({pending: [{filename: jestmig, name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}], history: 0});
+        expect(files).toEqual({last: null, pending: [{filename: jestmig, name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}], history: 0});
     });
 
     test("Should perform pending migrations", async () => {
@@ -357,7 +357,7 @@ describe("Migration using custom Knex database client", () => {
 
     test("Should list empty pending migrations with history", async () => {
         const files = await mig.pending();
-        expect(files).toEqual({pending: [], history: 1});
+        expect(files).toEqual({pending: [], history: 1, last: {name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}});
     });
 
     test("Should create 4 migration files with SQL", async () => {
@@ -387,7 +387,7 @@ describe("Migration using custom Knex database client", () => {
                 ts: parseInt(item.match(/^([0-9]+)_/)[1], 10)
             };
         });
-        expect(files).toEqual({pending, history: 1});
+        expect(files).toEqual({pending, history: 1, last: {name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}});
     });
 
     test("Should perform 2 pending migrations over 3 steps", async () => {
@@ -448,7 +448,7 @@ describe("Migration using default database client with connection parameters", (
 
     test("Should list empty pending migrations", async () => {
         const files = await mig.pending();
-        expect(files).toEqual({pending: [], history: 0});
+        expect(files).toEqual({pending: [], history: 0, last: null});
     });
 
     test("Should create migration files", async () => {
@@ -459,7 +459,7 @@ describe("Migration using default database client with connection parameters", (
 
     test("Should list pending migrations", async () => {
         const files = await mig.pending();
-        expect(files).toEqual({pending: [{filename: jestmig, name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}], history: 0});
+        expect(files).toEqual({last: null, pending: [{filename: jestmig, name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}], history: 0});
     });
 
     test("Should perform pending migrations", async () => {
@@ -471,7 +471,7 @@ describe("Migration using default database client with connection parameters", (
 
     test("Should list empty pending migrations with history", async () => {
         const files = await mig.pending();
-        expect(files).toEqual({pending: [], history: 1});
+        expect(files).toEqual({pending: [], history: 1, last: {name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}});
     });
 
     test("Should create 4 migration files with SQL", async () => {
@@ -501,7 +501,7 @@ describe("Migration using default database client with connection parameters", (
                 ts: parseInt(item.match(/^([0-9]+)_/)[1], 10)
             };
         });
-        expect(files).toEqual({pending, history: 1});
+        expect(files).toEqual({pending, history: 1, last: {name: jestmig.replace(/^([0-9]+)_/, ""), ts: parseInt(jestmig.match(/^([0-9]+)_/)[1], 10)}});
     });
 
     test("Should perform 2 pending migrations over 3 steps", async () => {
