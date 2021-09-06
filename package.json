@@ -23,15 +23,13 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "commander": "^6.1.0",
     "pg": "^8.3.3"
   },
   "devDependencies": {
-    "concat-stream": "^2.0.0",
     "coveralls": "^3.1.0",
     "eslint": "^7.9.0",
-    "jest": "^26.4.2",
-    "knex": "^0.21.6"
+    "jest": "27.1.0",
+    "knex": "0.95.11"
   },
   "scripts": {
     "lint": "eslint --ignore-path .gitignore .",
