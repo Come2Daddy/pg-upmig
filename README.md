@@ -8,7 +8,6 @@
 > You don't rollback, if your step forward has altered data you may end with some messed up relations :sob:. Going forward only is a way to force you into thinking the migration as a whole.
 
 * [Install](#install)
-* [CLI](#cli)
 * [API](#api)
 
 ## Install
@@ -80,62 +79,6 @@ You may want to use your specific client query builder (**API**) instead of raw 
 The SQL files in sql directory are placeholders for you to write migrations steps.
 
 ## Usage
-
-### CLI
-```bash
-Usage: pg-upmig [options] [command]
-
-Options:
-  -V, --version   output the version number
-  -h, --help      display help for command
-  -m, --migrations <path>  specify migrations path (default: "./migrations")
-  -p, --pgtable <table>    specify migration table name (default: "pg_upmig")
-  -r, --reject             dont ignore unauthorized ssl rejection
-  -d, --debug              print debug informations
-
-Commands:
-  up [options]    perform all pending migrations
-  create [options]   generate new migration file
-  pending [options]  list pending migrations
-  help [command]  display help for command
-```
-
-#### up
->Performs all pending migration, chronologically since the latest performed migration to the latest, specified timestamp or number of steps, which ever happen first.
-```bash
-Usage: pg-upmig up [options]
-
-Perform all pending migrations
-
-Options:
-  -t, --to <timestamp>     migrate to specific version
-  -s, --steps <number>     mimit the number of migration to apply
-  -h, --help               display help for command
-```
-
-#### create
->Generates a new set of migration files, allowing you to skip SQL source file creation in case you plan on using a custom client with query builder.
-```bash
-Usage: pg-upmig create <filename>
-
-Generate new migration file
-
-Options:
-  -n, --nosql              prevent creation of sql file
-  -h, --help               display help for command
-```
-
-#### pending
->Lists pending migrations, and shows number of done migrations.
-```bash
-Usage: pg-upmig pending [options]
-
-List pending migrations
-
-Options:
-  -H, --history            show history about migrations
-  -h, --help               display help for command
-```
 
 ### API
 
