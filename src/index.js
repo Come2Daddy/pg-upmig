@@ -51,7 +51,7 @@ class migration {
             resultKey: "rows",
             steps: 0,
             to: 0,
-            debug: false
+            debug: String(process.env.UPMIG_DEBUG).toLowerCase() === "true"
         };
 
         try {
