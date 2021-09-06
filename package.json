@@ -1,6 +1,6 @@
 {
   "name": "pg-upmig",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "description": "Postgresql migration tool",
   "keywords": [
     "database",
