@@ -13,12 +13,12 @@ let migs = [];
 beforeAll(async () => {
     DB = new Client();
     await DB.connect();
-    await teardown();
+    await teardown(DB);
 });
 
 afterAll(async () => {
+    await teardown(DB);
     DB.end();
-    await teardown();
 });
 
 describe("Covering privates and specific code with default env vars", () => {
@@ -28,9 +28,9 @@ describe("Covering privates and specific code with default env vars", () => {
     });
 
     afterAll(async () => {
-        mig.release();
+        await mig.release();
         mig = null;
-        await teardown();
+        await teardown(DB);
     });
 
     test("::_pluck -- array", () => {
@@ -55,12 +55,25 @@ describe("Covering privates and specific code with default env vars", () => {
 
     test("::_query -- wrong queryMethod", async () => {
         mig.options.queryMethod = "woooooow";
-        expect(await mig._query("SELECT NOW();")).toEqual({});
+        let thrown = false;
+        try {
+            await mig._query("SELECT NOW();");
+        } catch (error) {
+            thrown = true;
+        }
+        expect(thrown)
+        .toBe(true);
     });
 
     test("::up -- catch error", async () => {
-        await mig.create(fixtures.migrationFile);
-        expect(await mig.up()).toEqual([]);
+        let thrown = false;
+        try {
+            await mig.create(fixtures.migrationFile);
+            await mig.up();
+        } catch (error) {
+            thrown = true;
+        }
+        expect(thrown).toBe(true);
     });
 });
 
@@ -73,7 +86,7 @@ describe("Migration using environment variables", () => {
     afterAll(async () => {
         mig.release();
         mig = null;
-        await teardown();
+        await teardown(DB);
     });
 
     test("Should use default postgres client", async () => {
@@ -192,7 +205,7 @@ describe("Migration using custom PG database client", () => {
 
     afterAll(async () => {
         mig = null;
-        await teardown();
+        await teardown(DB);
     });
 
     test("Should use default postgres client", async () => {
@@ -317,7 +330,7 @@ describe("Migration using custom Knex database client", () => {
     afterAll(async () => {
         await mig.release();
         mig = null;
-        await teardown();
+        await teardown(DB);
     });
 
     test("Should create migrations directory", async () => {
@@ -431,7 +444,7 @@ describe("Migration using default database client with connection parameters", (
     afterAll(async () => {
         await mig.release();
         mig = null;
-        await teardown();
+        await teardown(DB);
     });
 
     test("Should create migrations directory", async () => {
