@@ -26,6 +26,7 @@ UPMIG_PATH=./migrations
 UPMIG_TABLE=pg_upmig
 UPMIG_REJECT=false
 UPMIG_DEBUG=false
+UPMIG_SSL=true
 ```
 or use `.upmigrc.js` to set global options:
 ```javascript
@@ -48,7 +49,6 @@ try {
 module.exports = {
   migrations: "./migrations", // Where to store migrations files
   table: "pg_upmig", // Table name where migrations history is stored
-  reject: false,
   debug: false
 };
 ```
@@ -73,7 +73,7 @@ module.exports = (client, method) => {
   });
 }
 ```
-You may want to use your specific client query builder (**API**) instead of raw SQL queries. You may also want to skip sql file creation ([CLI](#create), [API](#pg-upmig.createname-nosql))
+You may want to use your specific client query builder (**API**) instead of raw SQL queries. You may also want to skip sql file creation (**[API](#pg-upmig.createname-nosql)**)
 
 ### SQL queries
 The SQL files in sql directory are placeholders for you to write migrations steps.
@@ -156,7 +156,8 @@ const client = knex({
         user : process.env.PGUSER,
         password : process.env.PGPASSWORD,
         database : process.env.PGDATABASE,
-        port: process.env.PGPORT
+        port: process.env.PGPORT,
+        ssl: String(process.env.UPMIG_SSL).toLowerCase()==="false" ? false : { rejectUnauthorized: String(process.env.UPMIG_REJECT).toLowerCase()==="true"}
     }
 });
 

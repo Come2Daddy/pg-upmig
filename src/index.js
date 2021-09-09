@@ -75,20 +75,17 @@ class migration {
         if (!this.client) {
             if ((params||{}).connection) {
                 if (!params.connection.hasOwnProperty("ssl")) {
-                    params.connection.ssl= { rejectUnauthorized:  Boolean(process.env.UPMIG_REJECT||0) };
-                } else if (!params.connection.ssl.hasOwnProperty("rejectUnauthorized")) {
-                    params.connection.ssl["rejectUnauthorized"] = Boolean(process.env.UPMIG_REJECT||0);
+                    params.connection.ssl= { rejectUnauthorized:  String(process.env.UPMIG_REJECT).toLowerCase()==="true" };
+                } else if (typeof params.connection.ssl !== "boolean" && !params.connection.ssl.hasOwnProperty("rejectUnauthorized")) {
+                    params.connection.ssl["rejectUnauthorized"] = String(process.env.UPMIG_REJECT).toLowerCase()==="true";
                 }
                 // Uses connection params
                 this.client = new Client(params.connection);
             } else {
                 // Try to connect with environment variables
                 // At this point, if nothing is provided we let PG client rise errors
-                this.client = new Client({
-                    ssl: {
-                        rejectUnauthorized: Boolean(process.env.UPMIG_REJECT||0)
-                    }
-                });
+                const ssl = String(process.env.UPMIG_SSL).toLowerCase()==="false" ? false : {rejectUnauthorized: String(process.env.UPMIG_REJECT).toLowerCase()==="true"};
+                this.client = new Client({ssl});
             }
         }
     }
@@ -138,7 +135,7 @@ class migration {
             return this.client[this.options.queryMethod].apply(this.client, [...arguments]);
         } catch (error) {
             this._debug(error, 1);
-            return Promise.resolve({});
+            throw(error);
         }
     }
 
